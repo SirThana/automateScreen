@@ -6,14 +6,18 @@ from PIL import ImageChops #Compare images || Image Chop --> Channel - Operation
 import platform #       --> Show python version in use
 import time #           --> meassure FPS 
 import sys #            --> system functionality, read n write to log.txt
+import pyautogui
 import datetime #       --> for logging purposes
+import mouse #          --> Mouse capabilities
+
 __author__  =   "Martijn Zijl"
 __version__ =   "1.1"
 
 #TODO
 #1. fix compareFrame function to return true, based on image differences || DONE
 #2. Write a function that gets the true values from each frame? || DONE
-#3. Write logic that reacts to frame changes by using the mouse. click on a position
+#3. Write logic that reacts to frame changes by using the mouse. click on a position??
+
 
 
 #   --> Write to the log whenever a change in frame occured, do so with a timestamp
@@ -25,11 +29,13 @@ def writeLog(lastImage, currentImg):
 
     #if there is a difference in frames, log it with the current date & time
     if(compareFrame(lastImage, currentImg) == True):
-        write.write(str(datetime.datetime.now()))
+        date = datetime.datetime.now()
+
+        write.write(str(date))
         write.write("\n")
 
         #Save a screenshot of currentImg
-        date = str(datetime.datetime.now()) + '.bmp'
+        date = str(date) + '.png'
         currentImg.save(date)
 
     #Close read n write
@@ -41,13 +47,16 @@ def writeLog(lastImage, currentImg):
 def getNumpy(image):
     return np.array(image)
 
+def getTrueDiff(lastImage, currentImg):
+    diff = ImageChops.difference(lastImage, currentImg)
+    return diff
+
 #   --> Compare frames to find differences in the pixel values using ImageChop from PIL
 def compareFrame(lastImage, currentImg):
     diff = ImageChops.difference(currentImg, lastImage)
     if diff.getbbox():
         return True
     return False
-
 
 
 print(platform.python_version()) #Show python version
@@ -69,11 +78,13 @@ while True:
     currentImg = Image.frombytes('RGB', (w,h), sct.grab(monitor).rgb)
 
     #Draw the image using the cv2 library and the input from img in a numpy array
-    #cv2.imshow('screenFeed', cv2.cvtColor(np.array(currentImg), cv2.COLOR_BGR2RGB))
+    cv2.imshow('screenFeed', cv2.cvtColor(np.array(currentImg), cv2.COLOR_BGR2RGB))
     x = (compareFrame(currentImg, lastImage))
-    writeLog(lastImage, currentImg)
-    #reset the last image
-    lastImage = currentImg
+    print(x)
+
+    print(np.array(getTrueDiff(currentImg, lastImage)))
+    #writeLog(lastImage, currentImg)
+    lastImage = currentImg #Reset the last image
 
 
     #Meassure Frame rate per second

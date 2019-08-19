@@ -1,2 +1,2 @@
 # automateScreen
-basic logic to catch frame differences
+basic logic to catch frame differences.
